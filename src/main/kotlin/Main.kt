@@ -1,15 +1,51 @@
+import kotlin.system.exitProcess
+import kotlin.math.abs
+
+fun readNormalno(prompt: String): Int {
+    while (true) {
+        print(prompt)
+        val line = readLine()
+        if (line == null) {
+            println("Ввод отсутствует. Попробуйте ещё раз.")
+            continue
+        }
+        val num = line.trim().toIntOrNull()
+        if (num == null) {
+            println("Нужно ввести целое число. Попробуйте снова.")
+            continue
+        }
+        return num
+    }
+}
+
+fun readNonEmptyLine(nazvanie: String): String {
+    while (true) {
+        print(nazvanie)
+        val line = readLine()
+        if (line == null) {
+            println("Ввод отсутствует. Попробуйте ещё раз.")
+            continue
+        }
+        val trimmed = line.trim()
+        if (trimmed.isEmpty()) {
+            println("Пустая строка. Попробуйте снова.")
+            continue
+        }
+        return trimmed
+    }
+}
+
 fun main() {
     while (true) {
-        println("\n=== МЕНЮ ===")
-        println("1 - Задача 1")
-        println("2 - Задача 2")
-        println("3 - Задача 3")
-        println("4 - Задача 4")
-        println("4 - Задача 5")
+        println()
+        println("=== МЕНЮ ===")
+        println("1 - Задача 1 (матрица: разные цифры)")
+        println("2 - Задача 2 (проверка симметрии 5x5)")
+        println("3 - Задача 3 (в двоичную систему)")
+        println("4 - Задача 4 (пересечение массивов)")
+        println("5 - Задача 5 (группировка анаграмм)")
         println("0 - Выход")
-        print("Выберите цифру: ")
-
-        val choice = readLine()!!.toInt()
+        val choice = readNormalno("Выберите цифру: ")
 
         if (choice == 1) {
             task1()
@@ -23,7 +59,7 @@ fun main() {
             task5()
         } else if (choice == 0) {
             println("ВЫХОД")
-            break
+            exitProcess(0)
         } else {
             println("Неправильный выбор!")
         }
@@ -31,42 +67,52 @@ fun main() {
 }
 
 fun task1() {
-    print("Сколько строк? ")
-    val rows = readLine()!!.toInt()
-    print("Сколько столбцов? ")
-    val cols = readLine()!!.toInt()
+    val rows = readNormalno("Сколько строк? ")
+    val cols = readNormalno("Сколько столбцов? ")
 
     val numbers = Array(rows) { IntArray(cols) }
     val allDigits = mutableSetOf<Char>()
 
-    println("Вводите числа:")
+    println("Вводите числа (целые):")
+    var i = 0
+    while (i < rows) {
+        var j = 0
+        while (j < cols) {
+            val prompt = "Число [$i][$j]: "
+            val value = readNormalno(prompt)
+            numbers[i][j] = value
 
-    for (i in 0 until rows) {
-        for (j in 0 until cols) {
-            print("Число [$i][$j]: ")
-            numbers[i][j] = readLine()!!.toInt()
-
-            val numStr = numbers[i][j].toString()
-            for (digit in numStr) {
-                allDigits.add(digit)
+            val s = value.toString()
+            var k = 0
+            while (k < s.length) {
+                allDigits.add(s[k])
+                k = k + 1
             }
+
+            j = j + 1
         }
+        i = i + 1
     }
 
     println("\nВаш массив:")
-    for (i in 0 until rows) {
-        for (j in 0 until cols) {
-            print("${numbers[i][j]}\t")
+    i = 0
+    while (i < rows) {
+        var j = 0
+        while (j < cols) {
+
+            print(numbers[i][j].toString() + "\t")
+            j = j + 1
         }
         println()
+        i = i + 1
     }
 
-    println("\nРазных цифр: ${allDigits.size}")
-    println("Цифры: ${allDigits.sorted().joinToString(", ")}")
+    val sortedDigits = allDigits.toList().sorted()
+    println("\nРазных цифр: " + sortedDigits.size)
+    println("Цифры: " + sortedDigits.joinToString(", "))
 }
 
 fun task2() {
-
     val numbers = arrayOf(
         intArrayOf(5, 9, 6, 7, 2),
         intArrayOf(9, 8, 4, 5, 3),
@@ -76,23 +122,34 @@ fun task2() {
     )
 
     println("Массив 5x5:")
-    for (i in 0..4) {
-        for (j in 0..4) {
-            print("${numbers[i][j]}\t")
+    var i = 0
+    while (i < 5) {
+        var j = 0
+        while (j < 5) {
+            print(numbers[i][j].toString() + "\t")
+            j = j + 1
         }
         println()
+        i = i + 1
     }
 
     var symmetric = true
-    for (i in 0..4) {
-        for (j in 0..4) {
-            if (numbers[i][j] != numbers[j][i]) {
+    i = 0
+    while (i < 5) {
+        var j = 0
+        while (j < 5) {
+
+            if (numbers[i][j] == numbers[j][i]) {
+
+            } else {
                 symmetric = false
             }
+            j = j + 1
         }
+        i = i + 1
     }
 
-    if (symmetric) {
+    if (symmetric == true) {
         println("Массив симметричный")
     } else {
         println("Массив НЕ симметричный")
@@ -100,120 +157,150 @@ fun task2() {
 }
 
 fun task3() {
-    print("Введите число: ")
-    val number = readLine()!!.toInt()
+    val number = readNormalno("Введите число: ")
 
-    val binary = number.toString(2)
-    println("В двоичной системе: $binary")
+    val binary = Integer.toBinaryString(number)
+    println("В двоичной системе: " + binary)
 }
 
 fun task4() {
-
     println("Введите массив (числа через пробел):")
-    val masOne = readLine()!!
+    val masOneLine = readNonEmptyLine("Первый массив: ")
     println("Введите второй массив (числа через пробел):")
-    val masTwo = readLine()!!
+    val masTwoLine = readNonEmptyLine("Второй массив: ")
 
-    val parts1 = masOne.split(" ")
-    val parts2 = masTwo.split(" ")
+    val parts1 = masOneLine.trim().split(Regex("\\s+"))
+    val parts2 = masTwoLine.trim().split(Regex("\\s+"))
 
     val arr1 = IntArray(parts1.size)
     val arr2 = IntArray(parts2.size)
-    
-    var index1 = 0
-    while (index1 < parts1.size) {
-        arr1[index1] = parts1[index1].toInt()
-        index1++
+
+    var idx1 = 0
+    while (idx1 < parts1.size) {
+        arr1[idx1] = parts1[idx1].toIntOrNull() ?: 0
+        idx1 = idx1 + 1
+    }
+    var idx2 = 0
+    while (idx2 < parts2.size) {
+        arr2[idx2] = parts2[idx2].toIntOrNull() ?: 0
+        idx2 = idx2 + 1
     }
 
-    var index2 = 0
-    while (index2 < parts2.size) {
-        arr2[index2] = parts2[index2].toInt()
-        index2++
-    }
-
-    val result = natiPeresechenie(arr1, arr2)
+    val result = intersectionArrays(arr1, arr2)
 
     println("Пересечение массивов:")
     print("[")
-    for (i in result.indices) {
-        print(result[i])
-        if (i < result.size - 1) {
+    var p = 0
+    while (p < result.size) {
+        print(result[p])
+        if (p < result.size - 1) {
             print(", ")
         }
+        p = p + 1
     }
     println("]")
 }
 
-fun natiPeresechenie(a: IntArray, b: IntArray): IntArray {
+fun intersectionArrays(a: IntArray, b: IntArray): IntArray {
 
     val copyA = IntArray(a.size)
-    val copyB = IntArray(b.size)
-
-    for (i in a.indices) {
+    var i = 0
+    while (i < a.size) {
         copyA[i] = a[i]
+        i = i + 1
     }
-    for (i in b.indices) {
+    val copyB = IntArray(b.size)
+    i = 0
+    while (i < b.size) {
         copyB[i] = b[i]
+        i = i + 1
     }
 
-    val vremennoeHranilishe = IntArray(a.size + b.size)
-    var resultCount = 0
+    val usedB = BooleanArray(copyB.size)
+    val temp = IntArray(minOf(copyA.size, copyB.size))
+    var foundCount = 0
 
-    val usedMarker = -123456789
+    i = 0
+    while (i < copyA.size) {
+        var j = 0
+        var matched = false
+        while (j < copyB.size) {
+            if (copyA[i] == copyB[j] && usedB[j] == false) {
 
-    for (i in copyA.indices) {
-        for (j in copyB.indices) {
-            if (copyA[i] == copyB[j] && copyB[j] != usedMarker) {
-                vremennoeHranilishe[resultCount] = copyA[i]
-                resultCount++
-                copyB[j] = usedMarker
+                var already = false
+                var k = 0
+                while (k < foundCount) {
+                    if (temp[k] == copyA[i]) {
+                        already = true
+                        break
+                    }
+                    k = k + 1
+                }
+                if (already == false) {
+                    temp[foundCount] = copyA[i]
+                    foundCount = foundCount + 1
+                }
+                usedB[j] = true
+                matched = true
                 break
             }
+            j = j + 1
         }
+        if (matched == true) {
+
+        }
+        i = i + 1
     }
 
-    val final = IntArray(resultCount)
-    for (i in 0 until resultCount) {
-        final[i] = vremennoeHranilishe[i]
+    val final = IntArray(foundCount)
+    var t = 0
+    while (t < foundCount) {
+        final[t] = temp[t]
+        t = t + 1
     }
 
     var swapped = true
     var n = final.size
-    while (swapped) {
+    while (swapped == true) {
         swapped = false
-        for (i in 1 until n) {
-            if (final[i - 1] > final[i]) {
-                val tmp = final[i - 1]
-                final[i - 1] = final[i]
-                final[i] = tmp
+        var pIndex = 1
+        while (pIndex < n) {
+            if (final[pIndex - 1] > final[pIndex]) {
+                val tmp = final[pIndex - 1]
+                final[pIndex - 1] = final[pIndex]
+                final[pIndex] = tmp
                 swapped = true
             }
+            pIndex = pIndex + 1
         }
-        n--
+        n = n - 1
     }
 
     return final
 }
 
 fun task5() {
-    println("Введите слова через пробел:")
-
-    val input = readLine()!!
-    val words = input.split(" ")
+    println("Введите слова через пробел, например eat tea tan ate nat bat:")
+    val input = readNonEmptyLine("Слова: ")
+    val words = input.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
 
     val result = groupWords(words.toTypedArray())
 
     println("Группы слов:")
-    for (group in result) {
+    var i = 0
+    while (i < result.size) {
+        val group = result[i]
         print("\"")
-        for (i in group.indices) {
-            print(group[i])
-            if (i < group.size - 1) {
+        var j = 0
+        while (j < group.size) {
+            print(group[j])
+            if (j < group.size - 1) {
                 print("\", \"")
             }
+            j = j + 1
         }
         println("\"")
+        i = i + 1
     }
 }
 
@@ -221,66 +308,73 @@ fun groupWords(words: Array<String>): List<List<String>> {
     val groups = mutableListOf<List<String>>()
     val used = BooleanArray(words.size)
 
-    for (i in words.indices) {
-        if (used[i]) continue
-
+    var i = 0
+    while (i < words.size) {
+        if (used[i] == true) {
+            i = i + 1
+            continue
+        }
         val currentGroup = mutableListOf<String>()
         currentGroup.add(words[i])
         used[i] = true
 
-        for (j in i + 1 until words.size) {
-            if (used[j]) continue
-
-            if (haveSameLetters(words[i], words[j])) {
+        var j = i + 1
+        while (j < words.size) {
+            if (used[j] == true) {
+                j = j + 1
+                continue
+            }
+            if (haveSameLetters(words[i], words[j]) == true) {
                 currentGroup.add(words[j])
                 used[j] = true
             }
+            j = j + 1
         }
 
         groups.add(currentGroup)
+        i = i + 1
     }
 
     return groups
 }
 
 fun haveSameLetters(word1: String, word2: String): Boolean {
-    if (word1.length != word2.length) return false
-
-    val chars1 = CharArray(word1.length)
-    val chars2 = CharArray(word2.length)
-
-    for (i in word1.indices) {
-        chars1[i] = word1[i]
+    if (word1.length != word2.length) {
+        return false
     }
-    for (i in word2.indices) {
-        chars2[i] = word2[i]
-    }
+    val chars1 = word1.toCharArray()
+    val chars2 = word2.toCharArray()
 
     sortChars(chars1)
     sortChars(chars2)
 
-    for (i in chars1.indices) {
-        if (chars1[i] != chars2[i]) {
+    var i = 0
+    while (i < chars1.size) {
+        if (chars1[i] == chars2[i]) {
+
+        } else {
             return false
         }
+        i = i + 1
     }
-
     return true
 }
 
 fun sortChars(chars: CharArray) {
-    var swapped: Boolean
+    var swapped = true
     var n = chars.size
-    do {
+    while (swapped == true) {
         swapped = false
-        for (i in 1 until n) {
+        var i = 1
+        while (i < n) {
             if (chars[i - 1] > chars[i]) {
-                val temp = chars[i - 1]
+                val tmp = chars[i - 1]
                 chars[i - 1] = chars[i]
-                chars[i] = temp
+                chars[i] = tmp
                 swapped = true
             }
+            i = i + 1
         }
-        n--
-    } while (swapped)
+        n = n - 1
+    }
 }
